@@ -1,0 +1,27 @@
+article{
+    height: 380px;
+    width: 364px;
+}
+
+header{
+    color: #D04F4F;
+}
+
+input{
+    border: none;
+    background-color: #E7E7E7;
+}
+
+.img-article{
+    background-color: #C7BEBE;
+}
+
+.desc-article{
+    background-color: #E7E7E7;
+}
+
+.search{
+    width: 25px;
+    right: 14px;
+    top: 15px;
+}
