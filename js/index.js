@@ -1729,9 +1729,14 @@ console.log(recipes)
 
 function filterSearch(event){
     const filtre = event.target.value.toUpperCase()
-    const trie = recipes.filter(recette => recette.name.toUpperCase().includes(filtre))
-
+    const trie = recipes.filter(recette => recette.name.toUpperCase().includes(filtre) || recette.description.toUpperCase().includes(filtre) || ingredientsFilter(recette, filtre))
+    
     generateRecette(trie)
+}
+
+function ingredientsFilter(recette, filtre){
+    var listIngredients = recette.ingredients.forEach(ingre => ingre.ingredient.toUpperCase().includes(filtre))
+    return listIngredients
 }
 
 function generateRecette(recettes) {
