@@ -20,7 +20,7 @@ const recipes = [
             },
             {
                 "ingredient" : "Sucre",
-                "quantite" : 30,
+                "quantity" : 30,
                 "unit" : "grammes"
             },
             {
@@ -1739,6 +1739,22 @@ function generateRecette(recettes) {
     container.innerHTML = ""
 
     recettes.forEach(recette => {
-        container.insertAdjacentHTML('beforeend', '<article class="d-flex flex-column rounded overflow-hidden mb-4"> <div class="h-50 w-100 img-article"> </div><div class="d-flex h-50 flex-column p-2 desc-article"> <div class="d-flex align-items-center justify-content-evenly justify-content-between"> <h3>'+ recette.name +'</h3> <div class="d-flex align-items-center justify-content-between"> <i class="fa fa-clock-o fa-lg mr-2"></i> '+ recette.time +' min </div></div><div> desc </div></div></article>');
+        var ingredientsList = document.createElement("div");
+        ingredientsList.classList.add('d-flex')
+        ingredientsList.classList.add('flex-column')
+
+        recette.ingredients.forEach(ingre => {
+            const ingredient = ingre.ingredient || ""
+            const quantity = ingre.quantity || ""
+            const unit = ingre.unit || ""
+
+            var ingredientContainer = document.createElement("div");
+
+            ingredientContainer.innerHTML = ingredient + ": " + quantity + unit
+            ingredientsList.appendChild(ingredientContainer)
+        })
+
+        container.insertAdjacentHTML('beforeend',  '<article class="d-flex flex-column rounded overflow-hidden mb-4" id='+ recette.id +'> <div class="h-50 w-100 img-article"> </div><div class="d-flex h-50 flex-column p-2 desc-article"> <div class="d-flex align-items-center justify-content-evenly justify-content-between"> <h3>'+ recette.name +'</h3> <div class="d-flex align-items-center justify-content-between"> <i class="fa fa-clock-o fa-lg mr-2"></i> <div class="timer">'+ recette.time +' min </div> </div></div><div class="d-flex"> <div class="ingredients d-flex flex-column w-50"></div><div class="w-50"> desc </div></div></div></article>');
+        document.getElementById(recette.id).querySelector(".desc-article > div:nth-child(2) > div:nth-child(1)").appendChild(ingredientsList)
     });
 }

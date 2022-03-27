@@ -3,6 +3,10 @@ article{
     width: 364px;
 }
 
+h3{
+    font-size: 20px;
+}
+
 header{
     color: #D04F4F;
 }
@@ -18,6 +22,19 @@ input{
 
 .desc-article{
     background-color: #E7E7E7;
+}
+
+.ingredients{
+    font-size: 12px;
+}
+
+.ingredients > div{
+    height: 127px;
+    overflow: hidden;
+}
+
+.timer{
+    width: 57px;
 }
 
 .search{
