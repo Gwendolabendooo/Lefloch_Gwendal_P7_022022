@@ -1726,38 +1726,69 @@ const recipes = [
 ]
 
 function filterSearch(event){
-    // const filtre = event.target.value.toUpperCase()
-    // const trie = recipes.filter(recette => recette.name.toUpperCase().includes(filtre) || recette.description.toUpperCase().includes(filtre) || ingredientsFilter(recette, filtre))
-    
-    // generateRecette(trie)
+    const filtre = event.target.value.toUpperCase()
+    const tabFiltre = []
+
+    for (let recette = 0; recette < recipes.length; recette++) {
+        const elem = recipes[recette];
+        if (ingredientsFilter(elem, filtre) || nameFilter(elem, filtre) || descFilter(elem, filtre)) {
+            tabFiltre.push(elem)
+        }
+    }
+    generateRecette(tabFiltre)
 }
 
 function ingredientsFilter(recette, filtre){
-    var listIngredients = recette.ingredients.forEach(ingre => ingre.ingredient.toUpperCase().includes(filtre))
-    return listIngredients
+    var cond = false;
+
+    for (let ingre = 0; ingre < recette.length; ingre++) {
+        if (recette[ingre].ingredient.toUpperCase().indexOf(filtre) !== -1) {
+            cond = true;
+        }
+    }
+
+    return cond
+}
+
+function nameFilter(recette, filtre) {
+    if (recette.name.toUpperCase().indexOf(filtre) !== -1) {
+        return true
+    }else{
+        return false
+    }
+}
+
+function descFilter(recette, filtre) {
+    if (recette.description.toUpperCase().indexOf(filtre) !== -1) {
+        return true
+    }else{
+        return false
+    }
 }
 
 function generateRecette(recettes) {
     const container = document.querySelector("#recettes");
     container.innerHTML = ""
 
-    recettes.forEach(recette => {
+    for (let recette = 0; recette < recettes.length; recette++) {
         var ingredientsList = document.createElement("div");
         ingredientsList.classList.add('d-flex')
         ingredientsList.classList.add('flex-column')
+        console.log(recettes[recette].ingredients.ingredient)
 
-        recette.ingredients.forEach(ingre => {
-            const ingredient = ingre.ingredient || ""
-            const quantity = ingre.quantity || ""
-            const unit = ingre.unit || ""
+        for (let ingre = 0; ingre < recettes[recette].ingredients.length; ingre++) {
+            const ingredient = recettes[recette].ingredients[ingre].ingredient || ""
+            const quantity = recettes[recette].ingredients[ingre].quantity || ""
+            const unit = recettes[recette].ingredients[ingre].unit || ""
 
+            console.log(ingredient, quantity, unit)
             var ingredientContainer = document.createElement("div");
 
             ingredientContainer.innerHTML = ingredient + ": " + quantity + unit
             ingredientsList.appendChild(ingredientContainer)
-        })
+        }
 
-        container.insertAdjacentHTML('beforeend',  '<article class="d-flex flex-column rounded overflow-hidden mb-4" id='+ recette.id +'> <div class="h-50 w-100 img-article"> </div><div class="d-flex h-50 flex-column p-2 desc-article"> <div class="d-flex align-items-center justify-content-evenly justify-content-between"> <h3>'+ recette.name +'</h3> <div class="d-flex align-items-center justify-content-between"> <i class="fa fa-clock-o fa-lg mr-2"></i> <div class="timer">'+ recette.time +' min </div> </div></div><div class="d-flex"> <div class="ingredients d-flex flex-column w-50"></div><div class="w-50"> desc </div></div></div></article>');
-        document.getElementById(recette.id).querySelector(".desc-article > div:nth-child(2) > div:nth-child(1)").appendChild(ingredientsList)
-    });
+        container.insertAdjacentHTML('beforeend',  '<article class="d-flex flex-column rounded overflow-hidden mb-4" id='+ recettes[recette].id +'> <div class="h-50 w-100 img-article"> </div><div class="d-flex h-50 flex-column p-2 desc-article"> <div class="d-flex align-items-center justify-content-evenly justify-content-between"> <h3>'+ recettes[recette].name +'</h3> <div class="d-flex align-items-center justify-content-between"> <i class="fa fa-clock-o fa-lg mr-2"></i> <div class="timer">'+ recettes[recette].time +' min </div> </div></div><div class="d-flex"> <div class="ingredients d-flex flex-column w-50"></div><div class="w-50"> desc </div></div></div></article>');
+        document.getElementById(recettes[recette].id).querySelector(".desc-article > div:nth-child(2) > div:nth-child(1)").appendChild(ingredientsList)
+    }
 }
