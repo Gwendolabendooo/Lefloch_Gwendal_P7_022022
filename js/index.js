@@ -1725,13 +1725,11 @@ const recipes = [
     }
 ]
 
-console.log(recipes)
-
 function filterSearch(event){
-    const filtre = event.target.value.toUpperCase()
-    const trie = recipes.filter(recette => recette.name.toUpperCase().includes(filtre) || recette.description.toUpperCase().includes(filtre) || ingredientsFilter(recette, filtre))
+    // const filtre = event.target.value.toUpperCase()
+    // const trie = recipes.filter(recette => recette.name.toUpperCase().includes(filtre) || recette.description.toUpperCase().includes(filtre) || ingredientsFilter(recette, filtre))
     
-    generateRecette(trie)
+    // generateRecette(trie)
 }
 
 function ingredientsFilter(recette, filtre){
