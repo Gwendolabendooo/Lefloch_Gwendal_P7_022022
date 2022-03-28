@@ -42,3 +42,58 @@ input{
     right: 14px;
     top: 15px;
 }
+
+.search-2{
+    background: transparent;
+    color: white;
+    width: -webkit-fill-available;
+}
+
+.search-2::placeholder {
+    color: rgba(255, 255, 255, 0.592);
+  }
+
+.sticker > div{
+    display: none;
+}
+
+.sticker:hover > span{
+    display: none;
+}
+
+.sticker:hover > div{
+    display: block;
+}
+
+#ingredients{
+    max-width: 600px;
+}
+
+.etiquette{
+    width: fit-content;
+    margin-left: 0!important;
+}
+
+.etiquette > svg > path{
+    fill: white;
+}
+
+.etiquette > svg{
+    width: 25px;
+    padding-left: 8px;
+}
+
+.ingredient{
+    width: 200px;
+    height: 25px;
+    cursor: pointer;
+    transition: all .4s;
+    -webkit-transition: all .4s;
+    -moz-transition: all .4s;
+    -ms-transition: all .4s;
+    -o-transition: all .4s;
+}
+
+.ingredient:hover{
+    background: #00000021;
+}
