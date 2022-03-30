@@ -1726,6 +1726,9 @@ const recipes = [
 ]
 
 var ListIngredients = []
+var selectedIngredients = []
+var valueSearchBar = ""
+
 
 function initFilter(){
     const filtre = ""
@@ -1739,18 +1742,27 @@ initFilter()
 
 function filterSearch(event){
     const filtre = event.target.value.toUpperCase()
+    var trie = recipes.filter(recette => recette.name.toUpperCase().includes(filtre) || recette.description.toUpperCase().includes(filtre) || ingredientsFilter(recette, filtre))
+    valueSearchBar = filtre
     if (filtre.length >= 3) {
-        const trie = recipes.filter(recette => recette.name.toUpperCase().includes(filtre) || recette.description.toUpperCase().includes(filtre) || ingredientsFilter(recette, filtre))
-        
         ListIngredients = []
         generateRecette(trie)
     }else{
         initFilter()
     }
+    //Trie ingredient
+    if (selectedIngredients.length > 0) {
+        selectedIngredients.forEach(ingredient => {
+            trie = trie.filter(recette => ingredientsFilter(recette, ingredient))
+        });
+        ListIngredients = []
+        generateRecette(trie)
+    }
 }
 
 //Filtre en fonction du sticker
 function filterSticker(event, type) {
+    console.log(event)
     if (event === null) {
         if (ListIngredients.length === 0 || ListIngredients.find(index => index.ingredient === type.toUpperCase()) === undefined) {
             ListIngredients.push({
@@ -1759,11 +1771,9 @@ function filterSticker(event, type) {
             generateStickerList(ListIngredients)
         }
     }else{
-        console.log(event.target.value.toUpperCase())
         const filtre = event.target.value.toUpperCase()
         var filterList = ListIngredients
         filterList.filter(recette => recette.ingredient.includes(filtre))
-        console.log(filterList, "test")
         generateStickerList(filterList.filter(recette => recette.ingredient.includes(filtre)))
     }
 }
@@ -1771,15 +1781,42 @@ function filterSticker(event, type) {
 function addEtiquette(id) {
     const newId = id +1
     const content = document.querySelector(".ingredient:nth-child("+ newId +")").innerHTML
-    document.getElementById("etiquettes").insertAdjacentHTML('beforeend', '<div class="etiquette d-flex font-16 p-1 pl-3 m-2 ml-0 pr-3 bg-primary text-white rounded">'+ content + '<svg onclick=removeEtiquette(event) xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM175 208.1L222.1 255.1L175 303C165.7 312.4 165.7 327.6 175 336.1C184.4 346.3 199.6 346.3 208.1 336.1L255.1 289.9L303 336.1C312.4 346.3 327.6 346.3 336.1 336.1C346.3 327.6 346.3 312.4 336.1 303L289.9 255.1L336.1 208.1C346.3 199.6 346.3 184.4 336.1 175C327.6 165.7 312.4 165.7 303 175L255.1 222.1L208.1 175C199.6 165.7 184.4 165.7 175 175C165.7 184.4 165.7 199.6 175 208.1V208.1z"/></svg></div>')
+
+    if (!selectedIngredients.includes(content)) {
+        selectedIngredients.push(content)
+        var trie = recipes.filter(recette => recette.name.toUpperCase().includes(valueSearchBar) || recette.description.toUpperCase().includes(valueSearchBar) || ingredientsFilter(recette, valueSearchBar))
+        selectedIngredients.forEach(ingredient => {
+            trie = trie.filter(recette => ingredientsFilter(recette, ingredient))
+        });
+        ListIngredients = []
+        generateRecette(trie)
+
+        document.getElementById("etiquettes").insertAdjacentHTML('beforeend', '<div class="etiquette d-flex font-16 p-1 pl-3 m-2 ml-0 pr-3 bg-primary text-white rounded"><div class="content">'+ content + '</div><svg onclick=removeEtiquette(event) xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM175 208.1L222.1 255.1L175 303C165.7 312.4 165.7 327.6 175 336.1C184.4 346.3 199.6 346.3 208.1 336.1L255.1 289.9L303 336.1C312.4 346.3 327.6 346.3 336.1 336.1C346.3 327.6 346.3 312.4 336.1 303L289.9 255.1L336.1 208.1C346.3 199.6 346.3 184.4 336.1 175C327.6 165.7 312.4 165.7 303 175L255.1 222.1L208.1 175C199.6 165.7 184.4 165.7 175 175C165.7 184.4 165.7 199.6 175 208.1V208.1z"/></svg></div>')
+    }
 }
 
 function removeEtiquette(event) {
+    var content = ""
     if (event.target.parentNode.classList.contains("etiquette")) {
         event.target.parentNode.remove()
+        content = event.target.parentNode.querySelector(".content").innerHTML
     }else{
         event.target.parentNode.parentNode.remove()   
+        content = event.target.parentNode.parentNode.querySelector(".content").innerHTML
     }
+    const index = selectedIngredients.indexOf(content)
+    selectedIngredients.splice(index, 1)
+
+    //Trie etiquette enlevée
+    var trie = recipes.filter(recette => recette.name.toUpperCase().includes(valueSearchBar) || recette.description.toUpperCase().includes(valueSearchBar) || ingredientsFilter(recette, valueSearchBar))
+    
+    if (selectedIngredients.length > 0) {
+        selectedIngredients.forEach(ingredient => {
+            trie = trie.filter(recette => ingredientsFilter(recette, ingredient))
+        });
+    }
+    ListIngredients = []
+    generateRecette(trie)
 }
 
 function generateStickerList(filter) {
@@ -1792,8 +1829,13 @@ function generateStickerList(filter) {
 }
 
 function ingredientsFilter(recette, filtre){
-    var listIngredients = recette.ingredients.forEach(ingre => ingre.ingredient.toUpperCase().includes(filtre))
-    return listIngredients
+    var contient = false
+    recette.ingredients.forEach(element => {
+        if (element.ingredient.toUpperCase() === filtre) {
+            contient = true
+        }
+    })
+    return contient
 }
 
 function generateRecette(recettes) {
