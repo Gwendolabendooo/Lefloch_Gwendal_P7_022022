@@ -1726,6 +1726,10 @@ const recipes = [
 ]
 
 var ListIngredients = []
+var ListAppareil = []
+var ListUstencils = []
+var selectedUstencils = []
+var selectedAppareil = []
 var selectedIngredients = []
 var valueSearchBar = ""
 
@@ -1735,6 +1739,7 @@ function initFilter(){
     const trie = recipes.filter(recette => recette.name.toUpperCase().includes(filtre) || recette.description.toUpperCase().includes(filtre) || ingredientsFilter(recette, filtre))
     
     ListIngredients = []
+    ListAppareil = []
     generateRecette(trie)
 }
 
@@ -1758,11 +1763,28 @@ function filterSearch(event){
         ListIngredients = []
         generateRecette(trie)
     }
+
+    //Trie appareil
+    if (selectedAppareil.length > 0) {
+        selectedAppareil.forEach(appareil => {
+            trie = trie.filter(recette => appareilFilter(recette, appareil))
+        });
+        ListAppareil = []
+        generateAppareil(trie)
+    }
+
+    //Trie ustencils
+    if (selectedUstencils.length > 0) {
+        selectedUstencils.forEach(appareil => {
+            trie = trie.filter(recette => ustencilFilter(recette, appareil))
+        });
+        ListUstencils = []
+        generateUstencil(trie)
+    }
 }
 
 //Filtre en fonction du sticker
 function filterSticker(event, type) {
-    console.log(event)
     if (event === null) {
         if (ListIngredients.length === 0 || ListIngredients.find(index => index.ingredient === type.toUpperCase()) === undefined) {
             ListIngredients.push({
@@ -1775,6 +1797,43 @@ function filterSticker(event, type) {
         var filterList = ListIngredients
         filterList.filter(recette => recette.ingredient.includes(filtre))
         generateStickerList(filterList.filter(recette => recette.ingredient.includes(filtre)))
+    }
+}
+
+//Filtre en fonction de l'appareil
+function filterAppareil(event, type) {
+    if (event === null) {
+        if (ListAppareil.length === 0 || ListAppareil.find(appareil => appareil.appareil === type.toUpperCase()) === undefined) {
+            console.log(ListAppareil, type)
+            ListAppareil.push({
+                appareil: type.toUpperCase()
+            })  
+            generateAppareil(ListAppareil)
+        }
+    }else{
+        const filtre = event.target.value.toUpperCase()
+        var filterList = ListAppareil
+        filterList.filter(recette => recette.appareil.includes(filtre))
+        generateAppareil(filterList.filter(recette => recette.includes(filtre)))
+    }
+}
+
+//Filtre en fonction de l'ustencil
+function filterUstencil(event, type) {
+    console.log(event, type, ListUstencils)
+    if (event === null) {
+        if (ListUstencils.length === 0 || ListUstencils.find(index => index.ustencil === type.toUpperCase()) === undefined) {
+            ListUstencils.push({
+                ustencil: type.toUpperCase()
+            })  
+            generateUstencil(ListUstencils)
+        }
+    }else{
+        const filtre = event.target.value.toUpperCase()
+        var filterList = ListUstencils
+        filterList.filter(recette => recette.ustensils.includes(filtre))
+        console.log(filterList)
+        generateUstencil(filterList.filter(recette => recette.ustensils.includes(filtre)))
     }
 }
 
@@ -1792,6 +1851,40 @@ function addEtiquette(id) {
         generateRecette(trie)
 
         document.getElementById("etiquettes").insertAdjacentHTML('beforeend', '<div class="etiquette d-flex font-16 p-1 pl-3 m-2 ml-0 pr-3 bg-primary text-white rounded"><div class="content">'+ content + '</div><svg onclick=removeEtiquette(event) xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM175 208.1L222.1 255.1L175 303C165.7 312.4 165.7 327.6 175 336.1C184.4 346.3 199.6 346.3 208.1 336.1L255.1 289.9L303 336.1C312.4 346.3 327.6 346.3 336.1 336.1C346.3 327.6 346.3 312.4 336.1 303L289.9 255.1L336.1 208.1C346.3 199.6 346.3 184.4 336.1 175C327.6 165.7 312.4 165.7 303 175L255.1 222.1L208.1 175C199.6 165.7 184.4 165.7 175 175C165.7 184.4 165.7 199.6 175 208.1V208.1z"/></svg></div>')
+    }
+}
+
+function addAppareil(id) {
+    const newId = id +1
+    const content = document.querySelector(".appareil:nth-child("+ newId +")").innerHTML
+
+    if (!selectedAppareil.includes(content)) {
+        selectedAppareil.push(content)
+        var trie = recipes.filter(recette => recette.name.toUpperCase().includes(valueSearchBar) || recette.description.toUpperCase().includes(valueSearchBar) || appareilFilter(recette, valueSearchBar))
+        selectedAppareil.forEach(ingredient => {
+            trie = trie.filter(recette => appareilFilter(recette, ingredient))
+        });
+        ListAppareil = []
+        generateRecette(trie)
+
+        document.getElementById("etiquettes").insertAdjacentHTML('beforeend', '<div class="etiquette app d-flex font-16 p-1 pl-3 m-2 ml-0 pr-3 bg-primary text-white rounded"><div class="content">'+ content + '</div><svg onclick=removeAppareil(event) xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM175 208.1L222.1 255.1L175 303C165.7 312.4 165.7 327.6 175 336.1C184.4 346.3 199.6 346.3 208.1 336.1L255.1 289.9L303 336.1C312.4 346.3 327.6 346.3 336.1 336.1C346.3 327.6 346.3 312.4 336.1 303L289.9 255.1L336.1 208.1C346.3 199.6 346.3 184.4 336.1 175C327.6 165.7 312.4 165.7 303 175L255.1 222.1L208.1 175C199.6 165.7 184.4 165.7 175 175C165.7 184.4 165.7 199.6 175 208.1V208.1z"/></svg></div>')
+    }
+}
+
+function addUstencil(id) {
+    const newId = id +1
+    const content = document.querySelector(".ustencil:nth-child("+ newId +")").innerHTML
+
+    if (!selectedUstencils.includes(content)) {
+        selectedUstencils.push(content)
+        var trie = recipes.filter(recette => recette.name.toUpperCase().includes(valueSearchBar) || recette.description.toUpperCase().includes(valueSearchBar) || ustencilFilter(recette, valueSearchBar))
+        selectedUstencils.forEach(ingredient => {
+            trie = trie.filter(recette => ustencilFilter(recette, ingredient))
+        });
+        ListUstencils = []
+        generateRecette(trie)
+
+        document.getElementById("etiquettes").insertAdjacentHTML('beforeend', '<div class="etiquette usten d-flex font-16 p-1 pl-3 m-2 ml-0 pr-3 bg-primary text-white rounded"><div class="content">'+ content + '</div><svg onclick=removeUstencil(event) xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM175 208.1L222.1 255.1L175 303C165.7 312.4 165.7 327.6 175 336.1C184.4 346.3 199.6 346.3 208.1 336.1L255.1 289.9L303 336.1C312.4 346.3 327.6 346.3 336.1 336.1C346.3 327.6 346.3 312.4 336.1 303L289.9 255.1L336.1 208.1C346.3 199.6 346.3 184.4 336.1 175C327.6 165.7 312.4 165.7 303 175L255.1 222.1L208.1 175C199.6 165.7 184.4 165.7 175 175C165.7 184.4 165.7 199.6 175 208.1V208.1z"/></svg></div>')
     }
 }
 
@@ -1819,6 +1912,55 @@ function removeEtiquette(event) {
     generateRecette(trie)
 }
 
+function removeAppareil(event) {
+    var content = ""
+    if (event.target.parentNode.classList.contains("etiquette")) {
+        event.target.parentNode.remove()
+        content = event.target.parentNode.querySelector(".content").innerHTML
+    }else{
+        event.target.parentNode.parentNode.remove()   
+        content = event.target.parentNode.parentNode.querySelector(".content").innerHTML
+    }
+    const index = selectedAppareil.indexOf(content)
+    selectedAppareil.splice(index, 1)
+
+    //Trie etiquette enlevée
+    var trie = recipes.filter(recette => recette.name.toUpperCase().includes(valueSearchBar) || recette.description.toUpperCase().includes(valueSearchBar) || ingredientsFilter(recette, valueSearchBar))
+    
+    if (selectedAppareil.length > 0) {
+        selectedAppareil.forEach(ingredient => {
+            trie = trie.filter(recette => appareilFilter(recette, ingredient))
+        });
+    }
+    ListAppareil = []
+    generateRecette(trie)
+}
+
+//Remove ustencil
+function removeUstencil(event) {
+    var content = ""
+    if (event.target.parentNode.classList.contains("etiquette")) {
+        event.target.parentNode.remove()
+        content = event.target.parentNode.querySelector(".content").innerHTML
+    }else{
+        event.target.parentNode.parentNode.remove()   
+        content = event.target.parentNode.parentNode.querySelector(".content").innerHTML
+    }
+    const index = selectedUstencils.indexOf(content)
+    selectedUstencils.splice(index, 1)
+
+    //Trie etiquette enlevée
+    var trie = recipes.filter(recette => recette.name.toUpperCase().includes(valueSearchBar) || recette.description.toUpperCase().includes(valueSearchBar) || ustencilFilter(recette, valueSearchBar))
+    
+    if (selectedUstencils.length > 0) {
+        selectedUstencils.forEach(ingredient => {
+            trie = trie.filter(recette => ustencilFilter(recette, ingredient))
+        });
+    }
+    ListUstencils = []
+    generateRecette(trie)
+}
+
 function generateStickerList(filter) {
     const ingre = document.getElementById("ingredients")
     ingre.innerHTML = ""
@@ -1828,10 +1970,49 @@ function generateStickerList(filter) {
     })
 }
 
+//genere la liste des appareils
+function generateAppareil(filter) {
+    const ingre = document.getElementById("Appareils")
+    ingre.innerHTML = ""
+
+    filter.forEach((appareil, index) => {
+        ingre.insertAdjacentHTML('beforeend', '<div class="appareil" onclick="addAppareil( '+ index +' ) ">'+ appareil.appareil +'</div>')
+    })
+}
+
+//genere la liste des ustencils
+function generateUstencil(filter) {
+    const ingre = document.getElementById("Ustencils")
+    ingre.innerHTML = ""
+    console.log(filter)
+
+    filter.forEach((recette, index) => {
+        ingre.insertAdjacentHTML('beforeend', '<div class="ustencil" onclick="addUstencil( '+ index +' ) ">'+ recette.ustencil +'</div>')
+    })
+}
+
 function ingredientsFilter(recette, filtre){
     var contient = false
     recette.ingredients.forEach(element => {
         if (element.ingredient.toUpperCase() === filtre) {
+            contient = true
+        }
+    })
+    return contient
+}
+
+function appareilFilter(recette, filtre){
+    var contient = false
+    if (recette.appliance.toUpperCase() === filtre) {
+        contient = true
+    }
+    return contient
+}
+
+function ustencilFilter(recette, filtre){
+    var contient = false
+    recette.ustensils.forEach(element => {
+        if (element.toUpperCase() === filtre) {
             contient = true
         }
     })
@@ -1847,6 +2028,8 @@ function generateRecette(recettes) {
             var ingredientsList = document.createElement("div");
             ingredientsList.classList.add('d-flex')
             ingredientsList.classList.add('flex-column')
+
+            filterAppareil(null, recette.appliance)
     
             recette.ingredients.forEach(ingre => {
                 const ingredient = ingre.ingredient || ""
@@ -1860,6 +2043,11 @@ function generateRecette(recettes) {
     
                 ingredientContainer.innerHTML = ingredient + ": " + quantity + unit
                 ingredientsList.appendChild(ingredientContainer)
+            })
+
+            recette.ustensils.forEach(ustencil => {
+                console.log(ustencil)
+                filterUstencil(null, ustencil)
             })
     
             container.insertAdjacentHTML('beforeend',  '<article class="d-flex flex-column rounded overflow-hidden mb-4" id='+ recette.id +'> <div class="h-50 w-100 img-article"> </div><div class="d-flex h-50 flex-column p-2 desc-article"> <div class="d-flex align-items-center justify-content-evenly justify-content-between"> <h3>'+ recette.name +'</h3> <div class="d-flex align-items-center justify-content-between"> <i class="fa fa-clock-o fa-lg mr-2"></i> <div class="timer">'+ recette.time +' min </div> </div></div><div class="d-flex"> <div class="ingredients d-flex flex-column w-50"></div><div class="w-50"> desc </div></div></div></article>');

@@ -65,7 +65,15 @@ input{
     display: block;
 }
 
-#ingredients{
+.sticker:nth-child(2){
+    background-color: #68D9A4!important;
+}
+
+.sticker:nth-child(3){
+    background-color: #ED6454!important;
+}
+
+#ingredients, #Ustencils, #Appareils{
     max-width: 600px;
 }
 
@@ -78,12 +86,20 @@ input{
     fill: white;
 }
 
+.app{
+    background-color: #68D9A4!important;
+}
+
 .etiquette > svg{
     width: 25px;
     padding-left: 8px;
 }
 
-.ingredient{
+.usten{
+    background-color: #ED6454!important;
+}
+
+.ingredient, .appareil, .ustencil{
     width: 200px;
     height: 25px;
     cursor: pointer;
@@ -94,6 +110,6 @@ input{
     -o-transition: all .4s;
 }
 
-.ingredient:hover{
+.ingredient:hover, .ustencil:hover, .appareil:hover{
     background: #00000021;
 }
