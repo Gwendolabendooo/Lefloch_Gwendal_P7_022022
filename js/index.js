@@ -24,7 +24,8 @@ const recipes = [
                 "unit" : "grammes"
             },
             {
-                "ingredient": "Glaçons"
+                "ingredient": "Glaçons",
+                "quantity" : 2
             }
         ],
         "time": 10,
@@ -52,7 +53,7 @@ const recipes = [
             },
             {
                 "ingredient" : "Carotte",
-                "quantite" : 1
+                "quantity" : 1
             },
             {
                 "ingredient" : "Citron Vert",
@@ -1740,18 +1741,29 @@ function initFilter(){
     
     ListIngredients = []
     ListAppareil = []
+    ListUstencils = []
     generateRecette(trie)
 }
 
 initFilter()
+filterSearch(null)
 
+//Filtre global
 function filterSearch(event){
-    const filtre = event.target.value.toUpperCase()
+    ListIngredients = []
+    ListAppareil = []
+    ListUstencils = []
+    let filtre = "";
+    if (event !== null && event.target.value.length >= 3) {
+        filtre = event.target.value.toUpperCase()   
+    }else{
+        filtre = ""
+    }
+
     var trie = recipes.filter(recette => recette.name.toUpperCase().includes(filtre) || recette.description.toUpperCase().includes(filtre) || ingredientsFilter(recette, filtre))
     valueSearchBar = filtre
     if (filtre.length >= 3) {
         ListIngredients = []
-        generateRecette(trie)
     }else{
         initFilter()
     }
@@ -1760,8 +1772,6 @@ function filterSearch(event){
         selectedIngredients.forEach(ingredient => {
             trie = trie.filter(recette => ingredientsFilter(recette, ingredient))
         });
-        ListIngredients = []
-        generateRecette(trie)
     }
 
     //Trie appareil
@@ -1769,18 +1779,33 @@ function filterSearch(event){
         selectedAppareil.forEach(appareil => {
             trie = trie.filter(recette => appareilFilter(recette, appareil))
         });
-        ListAppareil = []
-        generateAppareil(trie)
     }
 
     //Trie ustencils
     if (selectedUstencils.length > 0) {
-        selectedUstencils.forEach(appareil => {
-            trie = trie.filter(recette => ustencilFilter(recette, appareil))
+        selectedUstencils.forEach(ustencil => {
+            trie = trie.filter(recette => ustencilFilter(recette, ustencil))
         });
-        ListUstencils = []
-        generateUstencil(trie)
     }
+    console.log("----------------")
+    //Genere la liste des ustencils dispo
+    trie.forEach(recette => {
+        recette.ustensils.forEach(ustencil => {
+            filterUstencil(null, ustencil)
+        })
+    })
+    //Genere la liste des ingredients dispo
+    trie.forEach(recette => {
+        recette.ingredients.forEach(listIngredient => {
+            filterSticker(null, listIngredient.ingredient)
+        })
+    })
+    //Genere la liste des Appareils
+    trie.forEach(recette => {
+        filterAppareil(null, recette.appliance)
+    })
+    //Genere les recettes triés
+    generateRecette(trie)
 }
 
 //Filtre en fonction du sticker
@@ -1804,7 +1829,6 @@ function filterSticker(event, type) {
 function filterAppareil(event, type) {
     if (event === null) {
         if (ListAppareil.length === 0 || ListAppareil.find(appareil => appareil.appareil === type.toUpperCase()) === undefined) {
-            console.log(ListAppareil, type)
             ListAppareil.push({
                 appareil: type.toUpperCase()
             })  
@@ -1814,13 +1838,12 @@ function filterAppareil(event, type) {
         const filtre = event.target.value.toUpperCase()
         var filterList = ListAppareil
         filterList.filter(recette => recette.appareil.includes(filtre))
-        generateAppareil(filterList.filter(recette => recette.includes(filtre)))
+        generateAppareil(filterList.filter(recette => recette.appareil.includes(filtre)))
     }
 }
 
 //Filtre en fonction de l'ustencil
 function filterUstencil(event, type) {
-    console.log(event, type, ListUstencils)
     if (event === null) {
         if (ListUstencils.length === 0 || ListUstencils.find(index => index.ustencil === type.toUpperCase()) === undefined) {
             ListUstencils.push({
@@ -1831,9 +1854,8 @@ function filterUstencil(event, type) {
     }else{
         const filtre = event.target.value.toUpperCase()
         var filterList = ListUstencils
-        filterList.filter(recette => recette.ustensils.includes(filtre))
-        console.log(filterList)
-        generateUstencil(filterList.filter(recette => recette.ustensils.includes(filtre)))
+        filterList.filter(recette => recette.ustencil.includes(filtre))
+        generateUstencil(filterList.filter(recette => recette.ustencil.includes(filtre)))
     }
 }
 
@@ -1848,10 +1870,11 @@ function addEtiquette(id) {
             trie = trie.filter(recette => ingredientsFilter(recette, ingredient))
         });
         ListIngredients = []
-        generateRecette(trie)
 
         document.getElementById("etiquettes").insertAdjacentHTML('beforeend', '<div class="etiquette d-flex font-16 p-1 pl-3 m-2 ml-0 pr-3 bg-primary text-white rounded"><div class="content">'+ content + '</div><svg onclick=removeEtiquette(event) xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM175 208.1L222.1 255.1L175 303C165.7 312.4 165.7 327.6 175 336.1C184.4 346.3 199.6 346.3 208.1 336.1L255.1 289.9L303 336.1C312.4 346.3 327.6 346.3 336.1 336.1C346.3 327.6 346.3 312.4 336.1 303L289.9 255.1L336.1 208.1C346.3 199.6 346.3 184.4 336.1 175C327.6 165.7 312.4 165.7 303 175L255.1 222.1L208.1 175C199.6 165.7 184.4 165.7 175 175C165.7 184.4 165.7 199.6 175 208.1V208.1z"/></svg></div>')
     }
+    filterSearch(null)
+
 }
 
 function addAppareil(id) {
@@ -1860,15 +1883,15 @@ function addAppareil(id) {
 
     if (!selectedAppareil.includes(content)) {
         selectedAppareil.push(content)
-        var trie = recipes.filter(recette => recette.name.toUpperCase().includes(valueSearchBar) || recette.description.toUpperCase().includes(valueSearchBar) || appareilFilter(recette, valueSearchBar))
+        var trie = recipes.filter(recette => recette.name.toUpperCase().includes(valueSearchBar) || recette.description.toUpperCase().includes(valueSearchBar))
         selectedAppareil.forEach(ingredient => {
             trie = trie.filter(recette => appareilFilter(recette, ingredient))
         });
         ListAppareil = []
-        generateRecette(trie)
 
         document.getElementById("etiquettes").insertAdjacentHTML('beforeend', '<div class="etiquette app d-flex font-16 p-1 pl-3 m-2 ml-0 pr-3 bg-primary text-white rounded"><div class="content">'+ content + '</div><svg onclick=removeAppareil(event) xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM175 208.1L222.1 255.1L175 303C165.7 312.4 165.7 327.6 175 336.1C184.4 346.3 199.6 346.3 208.1 336.1L255.1 289.9L303 336.1C312.4 346.3 327.6 346.3 336.1 336.1C346.3 327.6 346.3 312.4 336.1 303L289.9 255.1L336.1 208.1C346.3 199.6 346.3 184.4 336.1 175C327.6 165.7 312.4 165.7 303 175L255.1 222.1L208.1 175C199.6 165.7 184.4 165.7 175 175C165.7 184.4 165.7 199.6 175 208.1V208.1z"/></svg></div>')
     }
+    filterSearch(null)
 }
 
 function addUstencil(id) {
@@ -1882,10 +1905,10 @@ function addUstencil(id) {
             trie = trie.filter(recette => ustencilFilter(recette, ingredient))
         });
         ListUstencils = []
-        generateRecette(trie)
 
         document.getElementById("etiquettes").insertAdjacentHTML('beforeend', '<div class="etiquette usten d-flex font-16 p-1 pl-3 m-2 ml-0 pr-3 bg-primary text-white rounded"><div class="content">'+ content + '</div><svg onclick=removeUstencil(event) xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM175 208.1L222.1 255.1L175 303C165.7 312.4 165.7 327.6 175 336.1C184.4 346.3 199.6 346.3 208.1 336.1L255.1 289.9L303 336.1C312.4 346.3 327.6 346.3 336.1 336.1C346.3 327.6 346.3 312.4 336.1 303L289.9 255.1L336.1 208.1C346.3 199.6 346.3 184.4 336.1 175C327.6 165.7 312.4 165.7 303 175L255.1 222.1L208.1 175C199.6 165.7 184.4 165.7 175 175C165.7 184.4 165.7 199.6 175 208.1V208.1z"/></svg></div>')
     }
+    filterSearch(null)
 }
 
 function removeEtiquette(event) {
@@ -1909,7 +1932,7 @@ function removeEtiquette(event) {
         });
     }
     ListIngredients = []
-    generateRecette(trie)
+    filterSearch(null)
 }
 
 function removeAppareil(event) {
@@ -1933,7 +1956,7 @@ function removeAppareil(event) {
         });
     }
     ListAppareil = []
-    generateRecette(trie)
+    filterSearch(null)
 }
 
 //Remove ustencil
@@ -1958,7 +1981,7 @@ function removeUstencil(event) {
         });
     }
     ListUstencils = []
-    generateRecette(trie)
+    filterSearch(null)
 }
 
 function generateStickerList(filter) {
@@ -1984,7 +2007,6 @@ function generateAppareil(filter) {
 function generateUstencil(filter) {
     const ingre = document.getElementById("Ustencils")
     ingre.innerHTML = ""
-    console.log(filter)
 
     filter.forEach((recette, index) => {
         ingre.insertAdjacentHTML('beforeend', '<div class="ustencil" onclick="addUstencil( '+ index +' ) ">'+ recette.ustencil +'</div>')
@@ -2029,28 +2051,22 @@ function generateRecette(recettes) {
             ingredientsList.classList.add('d-flex')
             ingredientsList.classList.add('flex-column')
 
-            filterAppareil(null, recette.appliance)
-    
             recette.ingredients.forEach(ingre => {
                 const ingredient = ingre.ingredient || ""
-                const quantity = ingre.quantity || ""
+                var quantity = ingre.quantity || ""
                 const unit = ingre.unit || ""
-    
-                //Adapte filtre ingredients
-                filterSticker(null, ingredient)
+
+                if (quantity !== "") {
+                    quantity = ": " + quantity
+                }
     
                 var ingredientContainer = document.createElement("div");
     
-                ingredientContainer.innerHTML = ingredient + ": " + quantity + unit
+                ingredientContainer.innerHTML = "<b>" + ingredient + "</b>" + quantity + unit
                 ingredientsList.appendChild(ingredientContainer)
             })
-
-            recette.ustensils.forEach(ustencil => {
-                console.log(ustencil)
-                filterUstencil(null, ustencil)
-            })
     
-            container.insertAdjacentHTML('beforeend',  '<article class="d-flex flex-column rounded overflow-hidden mb-4" id='+ recette.id +'> <div class="h-50 w-100 img-article"> </div><div class="d-flex h-50 flex-column p-2 desc-article"> <div class="d-flex align-items-center justify-content-evenly justify-content-between"> <h3>'+ recette.name +'</h3> <div class="d-flex align-items-center justify-content-between"> <i class="fa fa-clock-o fa-lg mr-2"></i> <div class="timer">'+ recette.time +' min </div> </div></div><div class="d-flex"> <div class="ingredients d-flex flex-column w-50"></div><div class="w-50"> desc </div></div></div></article>');
+            container.insertAdjacentHTML('beforeend',  '<article class="d-flex flex-column rounded overflow-hidden mb-4" id='+ recette.id +'> <div class="h-50 w-100 img-article"> </div><div class="d-flex h-50 flex-column p-2 desc-article"> <div class="d-flex align-items-center justify-content-evenly justify-content-between"> <h3>'+ recette.name +'</h3> <div class="d-flex align-items-center justify-content-between"> <i class="fa fa-clock-o fa-lg mr-2"></i> <div class="timer font-weight-bold">'+ recette.time +' min </div> </div></div><div class="d-flex"> <div class="ingredients d-flex flex-column w-50"></div><div class="w-50 overflow-hidden desc-article-ellipsis"> '+ recette.description +' </div></div></div></article>');
             document.getElementById(recette.id).querySelector(".desc-article > div:nth-child(2) > div:nth-child(1)").appendChild(ingredientsList)
         }); 
     }//AUCUNE RECETTE
