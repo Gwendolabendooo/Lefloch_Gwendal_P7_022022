@@ -2071,7 +2071,7 @@ function generateRecette(recettes) {
         }); 
     }//AUCUNE RECETTE
     else{
-        container.insertAdjacentHTML('beforeend',  '<div> Aucune recette </div>');
+        container.insertAdjacentHTML('beforeend',  '<div> Aucune recette, veuillez faire une nouvelle recherche </div>');
     }
 
 }
