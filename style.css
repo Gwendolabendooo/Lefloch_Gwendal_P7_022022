@@ -43,6 +43,11 @@ input{
     top: 15px;
 }
 
+.arrow-down{
+    width: 18px;
+    right: 16px;
+}
+
 .desc-article-ellipsis{
     font-size: 12px;
     max-height: 123px;
@@ -68,6 +73,14 @@ input{
 
 .sticker:hover > span{
     display: none;
+}
+
+.sticker:hover > svg{
+    transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
 }
 
 .sticker:hover > div{
